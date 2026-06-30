@@ -1103,7 +1103,16 @@ app.post('/api/restore', authenticateToken, async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 });
+// Serve React Frontend
+const frontendPath = path.join(__dirname, "../dist");
 
+app.use(express.static(frontendPath));
+
+app.get("*", (req, res) => {
+  if (!req.path.startsWith("/api")) {
+    res.sendFile(path.join(frontendPath, "index.html"));
+  }
+});
 app.listen(PORT, () => {
   console.log(`Backend Server is running on http://localhost:${PORT}`);
 });

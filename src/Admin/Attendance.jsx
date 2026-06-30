@@ -33,7 +33,7 @@ export default function Attendance() {
       const token = localStorage.getItem('token');
       
       // 1. Fetch Students
-      const studentRes = await fetch(`http://localhost:3000/api/users?role=student`, {
+      const studentRes = await fetch(` /api/users?role=student`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const studentData = await studentRes.json();
@@ -48,7 +48,7 @@ export default function Attendance() {
       }
 
       // 2. Fetch Attendance Records for this class/section
-      const attRes = await fetch(`http://localhost:3000/api/attendance?className=${selectedClass}&section=${selectedSection}`, {
+      const attRes = await fetch(` /api/attendance?className=${selectedClass}&section=${selectedSection}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const attData = await attRes.json();
@@ -98,8 +98,8 @@ export default function Attendance() {
     try {
       const token = localStorage.getItem('token');
       const endpoint = (isLocked && isSuperAdmin) 
-        ? 'http://localhost:3000/api/attendance/override' 
-        : 'http://localhost:3000/api/attendance/submit';
+        ? '/api/attendance/override' 
+        : '/api/attendance/submit';
 
       const response = await fetch(endpoint, {
         method: 'POST',

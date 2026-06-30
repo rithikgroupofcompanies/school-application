@@ -28,7 +28,7 @@ export default function ReportCards() {
       
       // Fetch settings to check release status
       if (isSuperAdmin) {
-        const setRes = await fetch('http://localhost:3000/api/system/settings', {
+        const setRes = await fetch('/api/system/settings', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const setData = await setRes.json();
@@ -38,7 +38,7 @@ export default function ReportCards() {
       }
 
       // Fetch students
-      const studRes = await fetch('http://localhost:3000/api/users?role=student', {
+      const studRes = await fetch('/api/users?role=student', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const studData = await studRes.json();
@@ -51,7 +51,7 @@ export default function ReportCards() {
       }
 
       // Fetch tests
-      const testsRes = await fetch('http://localhost:3000/api/tests', {
+      const testsRes = await fetch('/api/tests', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const testsData = await testsRes.json();
@@ -78,7 +78,7 @@ export default function ReportCards() {
     setReleasing(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/system/reports/release', {
+      const response = await fetch('/api/system/reports/release', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -31,7 +31,7 @@ export default function Behaviour() {
       const token = localStorage.getItem('token');
 
       // Fetch logs
-      const logsRes = await fetch('http://localhost:3000/api/behaviour', {
+      const logsRes = await fetch('/api/behaviour', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const logsData = await logsRes.json();
@@ -40,7 +40,7 @@ export default function Behaviour() {
       }
 
       // Fetch students
-      const studentRes = await fetch('http://localhost:3000/api/users?role=student', {
+      const studentRes = await fetch('/api/users?role=student', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const studentData = await studentRes.json();
@@ -92,7 +92,7 @@ export default function Behaviour() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/behaviour/log', {
+      const response = await fetch('/api/behaviour/log', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

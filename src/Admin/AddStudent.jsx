@@ -41,7 +41,7 @@ export default function AddStudent() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/users/add', {
+      const response = await fetch('/api/users/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

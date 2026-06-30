@@ -29,7 +29,7 @@ export default function Settings() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/system/settings', {
+      const response = await fetch('/api/system/settings', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -58,7 +58,7 @@ export default function Settings() {
     setSaving(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/system/settings/update', {
+      const response = await fetch('/api/system/settings/update', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +86,7 @@ export default function Settings() {
     setBackingUp(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/backup', {
+      const response = await fetch('/api/backup', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -110,7 +110,7 @@ export default function Settings() {
     setRestoring(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/restore', {
+      const response = await fetch('/api/restore', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });

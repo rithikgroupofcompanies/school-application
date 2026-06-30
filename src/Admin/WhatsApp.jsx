@@ -27,7 +27,7 @@ export default function WhatsApp() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/whatsapp/logs', {
+      const response = await fetch('/api/whatsapp/logs', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -51,8 +51,8 @@ export default function WhatsApp() {
       const token = localStorage.getItem('token');
       const isBroadcast = isSuperAdmin && targetType === 'school';
       const endpoint = isBroadcast 
-        ? 'http://localhost:3000/api/whatsapp/broadcast' 
-        : 'http://localhost:3000/api/whatsapp/class-alert';
+        ? '/api/whatsapp/broadcast' 
+        : '/api/whatsapp/class-alert';
 
       const payload = isBroadcast 
         ? { text: messageText } 

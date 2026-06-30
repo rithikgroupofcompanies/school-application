@@ -29,7 +29,7 @@ export default function Homework() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/homework', {
+      const response = await fetch('/api/homework', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -58,7 +58,7 @@ export default function Homework() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/homework/add', {
+      const response = await fetch('/api/homework/add', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +94,7 @@ export default function Homework() {
     if (!window.confirm('Delete this homework assignment?')) return;
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:3000/api/homework/${id}`, {
+      const response = await fetch(` /api/homework/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
