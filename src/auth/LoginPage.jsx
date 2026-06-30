@@ -2,6 +2,7 @@ import  { useState } from "react";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import API_URL from "../config";
 
 import {
   teacherIcon,
@@ -32,7 +33,7 @@ export default function LoginPage() {
     }
 
     try {
-      const response = await fetch(" /api/login", {
+      const response = await fetch('${API_URL}/api/login', {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
