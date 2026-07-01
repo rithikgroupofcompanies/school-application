@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, ShieldAlert, CheckCircle, Clock, AlertTriangle, Check, X, ShieldCheck } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import API_URL from "../config";
 
 export default function Attendance() {
   const loggedInUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -33,7 +34,7 @@ export default function Attendance() {
       const token = localStorage.getItem('token');
       
       // 1. Fetch Students
-      const studentRes = await fetch(` /api/users?role=student`, {
+      const studentRes = await fetch(`${API_URL}/api/users?role=student`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const studentData = await studentRes.json();
@@ -48,7 +49,7 @@ export default function Attendance() {
       }
 
       // 2. Fetch Attendance Records for this class/section
-      const attRes = await fetch(` /api/attendance?className=${selectedClass}&section=${selectedSection}`, {
+      const attRes = await fetch(`${API_URL}/api/attendance?className=${selectedClass}&section=${selectedSection}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const attData = await attRes.json();
