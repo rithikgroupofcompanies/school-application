@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BookOpen, Calendar, Trash2, Plus, Info, CheckCircle } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import API_URL from "../config";
 
 export default function Homework() {
   const loggedInUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -29,7 +30,7 @@ export default function Homework() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/homework', {
+      const response = await fetch(`${API_URL}/api/homework`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -58,7 +59,7 @@ export default function Homework() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/homework/add', {
+      const response = await fetch(`${API_URL}/api/homework/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,7 +95,7 @@ export default function Homework() {
     if (!window.confirm('Delete this homework assignment?')) return;
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(` /api/homework/${id}`, {
+      const response = await fetch(`${API_URL} /api/homework/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
