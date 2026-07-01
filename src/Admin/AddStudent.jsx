@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { UserPlus, Hash, BookOpen, Layers, Mail, Lock, CheckCircle, AlertCircle } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import API_URL from "../config";
 
 export default function AddStudent() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -41,7 +42,7 @@ export default function AddStudent() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/users/add', {
+      const response = await fetch(`${API_URL}/api/users/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
