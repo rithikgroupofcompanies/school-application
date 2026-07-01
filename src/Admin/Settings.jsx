@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Settings as SettingsIcon, Shield, Database, Save, RefreshCw, Key, AlertTriangle, CheckCircle } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import API_URL from "../config";
 
 export default function Settings() {
   const loggedInUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -29,7 +30,7 @@ export default function Settings() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/system/settings', {
+      const response = await fetch(`${API_URL}/api/system/settings`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -58,7 +59,7 @@ export default function Settings() {
     setSaving(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/system/settings/update', {
+      const response = await fetch(`${API_URL}/api/system/settings/update`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -86,7 +87,7 @@ export default function Settings() {
     setBackingUp(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/backup', {
+      const response = await fetch(`${API_URL}/api/backup`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -110,7 +111,7 @@ export default function Settings() {
     setRestoring(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/restore', {
+      const response = await fetch(`${API_URL}/api/restore`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
