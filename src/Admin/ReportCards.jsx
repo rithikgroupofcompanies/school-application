@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Award, BookOpen, CheckCircle, Lock, Download, Settings, FileText, Globe } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import API_URL from "../config";
 
 export default function ReportCards() {
   const loggedInUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -28,7 +29,7 @@ export default function ReportCards() {
       
       // Fetch settings to check release status
       if (isSuperAdmin) {
-        const setRes = await fetch('/api/system/settings', {
+        const setRes = await fetch(`${API_URL}/api/system/settings`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         const setData = await setRes.json();
@@ -38,7 +39,7 @@ export default function ReportCards() {
       }
 
       // Fetch students
-      const studRes = await fetch('/api/users?role=student', {
+      const studRes = await fetch(`${API_URL}/api/users?role=student`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const studData = await studRes.json();
@@ -51,7 +52,7 @@ export default function ReportCards() {
       }
 
       // Fetch tests
-      const testsRes = await fetch('/api/tests', {
+      const testsRes = await fetch(`${API_URL}/api/tests`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const testsData = await testsRes.json();
@@ -78,7 +79,7 @@ export default function ReportCards() {
     setReleasing(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/system/reports/release', {
+      const response = await fetch(`${API_URL}/api/system/reports/release`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
