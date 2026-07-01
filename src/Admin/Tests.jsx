@@ -35,7 +35,7 @@ export default function Tests() {
       const token = localStorage.getItem('token');
 
       // Fetch Tests
-      const testsRes = await fetch('/api/tests', {
+      const testsRes = await fetch(`${API_URL}/api/tests`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const testsData = await testsRes.json();
@@ -44,7 +44,7 @@ export default function Tests() {
       }
 
       // Fetch Students
-      const studentRes = await fetch('/api/users?role=student', {
+      const studentRes = await fetch(`${API_URL}/api/users?role=student`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const studentData = await studentRes.json();
@@ -65,7 +65,7 @@ export default function Tests() {
     setCreating(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/tests/add', {
+      const response = await fetch(`${API_URL}/api/tests/add`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -116,7 +116,7 @@ export default function Tests() {
     setSaving(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/tests/marks', {
+      const response = await fetch(`${API_URL}/api/tests/marks`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
