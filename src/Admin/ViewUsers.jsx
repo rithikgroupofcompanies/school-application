@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Trash2, Users, Search } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import API_URL from "../config";
 
 export default function ViewUsers() {
   const loggedInUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -21,7 +22,7 @@ export default function ViewUsers() {
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/users', {
+      const response = await fetch(`${API_URL}/api/users`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -46,7 +47,7 @@ export default function ViewUsers() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(` /api/users/${id}`, {
+      const response = await fetch(`${API_URL}/api/users/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
