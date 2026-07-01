@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MessageSquare, Send, Globe, Users, Clock, CheckCircle } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import API_URL from "../config";
 
 export default function WhatsApp() {
   const loggedInUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -27,7 +28,7 @@ export default function WhatsApp() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/whatsapp/logs', {
+      const response = await fetch(`${API_URL}/api/whatsapp/logs`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -51,8 +52,8 @@ export default function WhatsApp() {
       const token = localStorage.getItem('token');
       const isBroadcast = isSuperAdmin && targetType === 'school';
       const endpoint = isBroadcast 
-        ? '/api/whatsapp/broadcast' 
-        : '/api/whatsapp/class-alert';
+        ? `${API_URL}/api/whatsapp/broadcast` 
+        : `${API_URL}/api/whatsapp/class-alert`;
 
       const payload = isBroadcast 
         ? { text: messageText } 
