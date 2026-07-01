@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Heart, Star, Send, Layers, Calendar, UserCheck } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import API_URL from "../config";
 
 export default function Behaviour() {
   const loggedInUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -31,7 +32,7 @@ export default function Behaviour() {
       const token = localStorage.getItem('token');
 
       // Fetch logs
-      const logsRes = await fetch('/api/behaviour', {
+      const logsRes = await fetch(`${API_URL}/api/behaviour`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const logsData = await logsRes.json();
@@ -40,7 +41,7 @@ export default function Behaviour() {
       }
 
       // Fetch students
-      const studentRes = await fetch('/api/users?role=student', {
+      const studentRes = await fetch(`${API_URL}/api/users?role=student`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const studentData = await studentRes.json();
@@ -92,7 +93,7 @@ export default function Behaviour() {
     setSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/behaviour/log', {
+      const response = await fetch(`${API_URL}/api/behaviour/log`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
