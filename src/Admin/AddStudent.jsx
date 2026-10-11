@@ -1,33 +1,36 @@
 import React, { useState } from 'react';
-import { UserPlus, Hash, BookOpen, Layers, Mail, Lock, CheckCircle, AlertCircle } from 'lucide-react';
+import { UserPlus, Hash, BookOpen, Layers, Mail, Lock, CheckCircle2, AlertCircle, Phone, User, MapPin, Calendar, ChevronRight, ChevronLeft } from 'lucide-react';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import API_URL from "../config";
+import API_URL from '../config';
 
 export default function AddStudent() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const isClassAdmin = user.role === 'admin';
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'student',
-    rollNumber: '',
-    className: isClassAdmin ? (user.className || '') : '',
-    section: isClassAdmin ? (user.section || '') : ''
-  });
+  const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  React.useEffect(() => {
-    if (isClassAdmin) {
-      setFormData(prev => ({
-        ...prev,
-        className: user.className || '',
-        section: user.section || ''
-      }));
-    }
-  }, [isClassAdmin, user.className, user.section]);
+  // Multi-step form state
+  const [formData, setFormData] = useState({
+    // Step 1: Personal
+    name: '',
+    email: '',
+    password: 'password123',
+    dob: '',
+    gender: 'Male',
+    // Step 2: Academic
+    admissionNumber: '',
+    rollNumber: '',
+    className: isClassAdmin ? (user.className || 'Class 10') : 'Class 10',
+    section: isClassAdmin ? (user.section || 'A') : 'A',
+    // Step 3: Guardian
+    guardianName: '',
+    guardianRelation: 'Father',
+    guardianPhone: '',
+    guardianEmail: '',
+    address: ''
+  });
 
   const handleChange = (e) => {
     setFormData(prev => ({
@@ -36,13 +39,29 @@ export default function AddStudent() {
     }));
   };
 
+  const handleNext = () => {
+    if (currentStep === 1 && !formData.name) {
+      toast.error('Student Name is required');
+      return;
+    }
+    if (currentStep === 2 && !formData.className) {
+      toast.error('Class is required');
+      return;
+    }
+    setCurrentStep(prev => Math.min(prev + 1, 3));
+  };
+
+  const handlePrev = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_URL}/api/users/add`, {
+      const response = await fetch(`${API_URL}/api/students/admit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,201 +73,305 @@ export default function AddStudent() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        toast.success(data.message || 'Student added successfully!');
+        toast.success(data.message || 'Student admitted successfully!');
         setFormData({
           name: '',
           email: '',
-          password: '',
-          role: 'student',
+          password: 'password123',
+          dob: '',
+          gender: 'Male',
+          admissionNumber: '',
           rollNumber: '',
-          className: '',
-          section: ''
+          className: isClassAdmin ? (user.className || 'Class 10') : 'Class 10',
+          section: isClassAdmin ? (user.section || 'A') : 'A',
+          guardianName: '',
+          guardianRelation: 'Father',
+          guardianPhone: '',
+          guardianEmail: '',
+          address: ''
         });
+        setCurrentStep(1);
       } else {
-        toast.error(data.message || 'Failed to add student');
+        toast.error(data.message || 'Failed to admit student');
       }
     } catch (error) {
       toast.error('Network error. Please try again.');
-      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
-      {/* Background Decorative Elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -z-10"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-30 -z-10"></div>
+    <div className="min-h-full py-8 px-4 sm:px-6 lg:px-8 bg-transparent">
+      <div className="max-w-3xl mx-auto space-y-6">
 
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center p-4 bg-blue-50 rounded-full mb-4">
-            <UserPlus className="w-8 h-8 text-blue-600" />
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center p-3.5 bg-blue-100 rounded-full mb-3 text-blue-600">
+            <UserPlus className="w-8 h-8" />
           </div>
-          <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">Add New Student</h1>
-          <p className="mt-3 text-lg text-gray-500">
-            Enter the student's details down below to register them in the system.
+          <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">Student Admission Wizard</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Comprehensive student enrollment with identity, placement, and guardian verification.
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-xl overflow-hidden animate-fade-in-up transition-all duration-300">
+        {/* Wizard Card */}
+        <div className="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl overflow-hidden border border-white/60">
           
-          {/* Header Strip */}
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-5 flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white">Student Information</h2>
-            <span className="bg-white/20 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-              Admin Access
+          {/* Progress Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-8 py-5 flex items-center justify-between text-white">
+            <div className="flex items-center gap-4">
+              <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
+                currentStep >= 1 ? 'bg-white text-blue-700' : 'bg-white/20'
+              }`}>1</span>
+              <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
+                currentStep >= 2 ? 'bg-white text-blue-700' : 'bg-white/20'
+              }`}>2</span>
+              <span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${
+                currentStep >= 3 ? 'bg-white text-blue-700' : 'bg-white/20'
+              }`}>3</span>
+            </div>
+            <span className="text-xs font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full">
+              Step {currentStep} of 3: {currentStep === 1 ? 'Identity' : currentStep === 2 ? 'Academic Placement' : 'Guardian Details'}
             </span>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-8 sm:p-10">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              
-              {/* Full Name */}
-              <div className="col-span-1 md:col-span-2">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Full Name</label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <UserPlus className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
-                  </div>
+          <form onSubmit={handleSubmit} className="p-8 sm:p-10 space-y-6">
+            
+            {/* Step 1: Personal Identity */}
+            {currentStep === 1 && (
+              <div className="space-y-4 animate-fade-in">
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Full Legal Name *</label>
                   <input
                     type="text"
                     name="name"
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="block w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-0 focus:border-blue-500 bg-gray-50/50 focus:bg-white transition-all text-gray-900 shadow-sm"
-                    placeholder="e.g. John Doe"
+                    placeholder="e.g. Alex Morgan"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold outline-none focus:border-blue-500"
                   />
                 </div>
-              </div>
 
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">School Email</label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Student Login Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      placeholder="alex.morgan@school.edu"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold"
+                    />
                   </div>
-                  <input
-                    type="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="block w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-0 focus:border-blue-500 bg-gray-50/50 focus:bg-white transition-all text-gray-900 shadow-sm"
-                    placeholder="student@school.edu"
-                  />
-                </div>
-              </div>
-
-              {/* Password */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Temporary Password</label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Initial Password</label>
+                    <input
+                      type="text"
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-mono"
+                    />
                   </div>
-                  <input
-                    type="text"
-                    name="password"
-                    required
-                    value={formData.password}
-                    onChange={handleChange}
-                    className="block w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-0 focus:border-blue-500 bg-gray-50/50 focus:bg-white transition-all text-gray-900 shadow-sm"
-                    placeholder="Password123"
-                  />
                 </div>
-              </div>
 
-              {/* Roll Number */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Roll Number</label>
-                <div className="relative group">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Hash className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Date of Birth</label>
+                    <input
+                      type="date"
+                      name="dob"
+                      value={formData.dob}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold"
+                    />
                   </div>
-                  <input
-                    type="text"
-                    name="rollNumber"
-                    required
-                    value={formData.rollNumber}
-                    onChange={handleChange}
-                    className="block w-full pl-11 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-0 focus:border-blue-500 bg-gray-50/50 focus:bg-white transition-all text-gray-900 shadow-sm"
-                    placeholder="e.g. 101"
-                  />
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Gender</label>
+                    <select
+                      name="gender"
+                      value={formData.gender}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold"
+                    >
+                      <option value="Male">Male</option>
+                      <option value="Female">Female</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
                 </div>
               </div>
+            )}
 
-              <div className="flex gap-4">
-                {/* Class Name */}
-                <div className="flex-1">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Class</label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <BookOpen className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
-                    </div>
+            {/* Step 2: Academic Placement */}
+            {currentStep === 2 && (
+              <div className="space-y-4 animate-fade-in">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Class *</label>
                     <select
                       name="className"
-                      required
-                      disabled={isClassAdmin}
                       value={formData.className}
                       onChange={handleChange}
-                      className="block w-full pl-11 pr-10 py-3 border-2 border-gray-200 rounded-xl focus:ring-0 focus:border-blue-500 bg-gray-50/50 focus:bg-white transition-all text-gray-900 shadow-sm appearance-none disabled:opacity-75 disabled:cursor-not-allowed"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold"
                     >
-                      <option value="" disabled>Select Class</option>
-                      {[...Array(12)].map((_, i) => (
-                        <option key={i+1} value={`Class ${i + 1}`}>Class {i + 1}</option>
-                      ))}
+                      <option value="Class 8">Class 8</option>
+                      <option value="Class 9">Class 9</option>
+                      <option value="Class 10">Class 10</option>
+                      <option value="Class 11">Class 11</option>
+                      <option value="Class 12">Class 12</option>
                     </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Section *</label>
+                    <select
+                      name="section"
+                      value={formData.section}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold"
+                    >
+                      <option value="A">Section A</option>
+                      <option value="B">Section B</option>
+                      <option value="C">Section C</option>
+                    </select>
                   </div>
                 </div>
 
-                {/* Section */}
-                <div className="flex-1">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Section</label>
-                  <div className="relative group">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                      <Layers className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
-                    </div>
-                    <select
-                      name="section"
-                      required
-                      disabled={isClassAdmin}
-                      value={formData.section}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Admission Number</label>
+                    <input
+                      type="text"
+                      name="admissionNumber"
+                      value={formData.admissionNumber}
                       onChange={handleChange}
-                      className="block w-full pl-11 pr-10 py-3 border-2 border-gray-200 rounded-xl focus:ring-0 focus:border-blue-500 bg-gray-50/50 focus:bg-white transition-all text-gray-900 shadow-sm appearance-none disabled:opacity-75 disabled:cursor-not-allowed"
-                    >
-                      <option value="" disabled>Select Sec</option>
-                      {['A', 'B', 'C', 'D'].map(sec => (
-                        <option key={sec} value={sec}>{sec}</option>
-                      ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                      <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
-                    </div>
+                      placeholder="e.g. ADM-2026-001"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold font-mono"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Roll Number</label>
+                    <input
+                      type="text"
+                      name="rollNumber"
+                      value={formData.rollNumber}
+                      onChange={handleChange}
+                      placeholder="e.g. 10A01"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold font-mono"
+                    />
                   </div>
                 </div>
               </div>
+            )}
+
+            {/* Step 3: Guardian & Contact Details */}
+            {currentStep === 3 && (
+              <div className="space-y-4 animate-fade-in">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Primary Guardian Name</label>
+                    <input
+                      type="text"
+                      name="guardianName"
+                      value={formData.guardianName}
+                      onChange={handleChange}
+                      placeholder="e.g. John Morgan"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Relationship</label>
+                    <select
+                      name="guardianRelation"
+                      value={formData.guardianRelation}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold"
+                    >
+                      <option value="Father">Father</option>
+                      <option value="Mother">Mother</option>
+                      <option value="Guardian">Legal Guardian</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Guardian Phone / WhatsApp</label>
+                    <input
+                      type="tel"
+                      name="guardianPhone"
+                      value={formData.guardianPhone}
+                      onChange={handleChange}
+                      placeholder="+91 9876543210"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Guardian Email</label>
+                    <input
+                      type="email"
+                      name="guardianEmail"
+                      value={formData.guardianEmail}
+                      onChange={handleChange}
+                      placeholder="parent@gmail.com"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-sm font-semibold"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-bold uppercase text-gray-500 mb-1">Residential Address</label>
+                  <textarea
+                    rows="2"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="Enter permanent address..."
+                    className="w-full px-4 py-2.5 rounded-xl border-2 border-gray-200 text-sm font-semibold"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Navigation Buttons */}
+            <div className="flex items-center justify-between pt-6 border-t border-gray-100">
+              <button
+                type="button"
+                onClick={handlePrev}
+                disabled={currentStep === 1}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-gray-600 font-semibold text-sm hover:bg-gray-100 disabled:opacity-30"
+              >
+                <ChevronLeft className="w-4 h-4" /> Previous
+              </button>
+
+              {currentStep < 3 ? (
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow"
+                >
+                  Continue <ChevronRight className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="inline-flex items-center gap-2 px-7 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm shadow-lg active:scale-95 transition-all"
+                >
+                  <CheckCircle2 className="w-5 h-5" />
+                  {loading ? 'Admitting Student...' : 'Complete Admission'}
+                </button>
+              )}
             </div>
 
-            <div className="mt-10">
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full flex justify-center py-4 px-4 border border-transparent rounded-xl shadow-lg text-lg font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all transform hover:-translate-y-0.5 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
-              >
-                {loading ? 'Processing...' : 'Register Student'}
-              </button>
-            </div>
           </form>
         </div>
+
       </div>
-      <ToastContainer position="bottom-right" />
     </div>
   );
 }

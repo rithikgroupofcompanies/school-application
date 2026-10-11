@@ -14,7 +14,11 @@ import {
   Menu, 
   X,
   ShieldAlert,
-  UserCheck
+  UserCheck,
+  FileSpreadsheet,
+  Clock,
+  Building2,
+  ChevronRight
 } from 'lucide-react';
 
 export default function AdminLayout() {
@@ -26,19 +30,24 @@ export default function AdminLayout() {
   const isSuperAdmin = user.role === 'super_admin';
 
   const navItems = isSuperAdmin ? [
-    { name: 'View All Users', path: '/admin/view-users', icon: Users, desc: 'Manage all accounts' },
-    { name: 'Add Student', path: '/admin/add-student', icon: UserPlus, desc: 'Register new students' },
-    { name: 'Add Staff', path: '/admin/add-staff', icon: UserPlus, desc: 'Register teachers & staff' },
-    { name: 'Attendance Monitor', path: '/admin/attendance', icon: Calendar, desc: 'Track & override locks' },
+    { name: 'School Directory', path: '/admin/schools', icon: Building2, desc: 'Multi-school SaaS onboarding' },
+    { name: 'Google Sheets Sync', path: '/admin/sheets', icon: FileSpreadsheet, desc: 'Non-technical admin sheets', badge: 'Sheets' },
+    { name: 'Timetable Engine', path: '/admin/timetable', icon: Clock, desc: 'Weekly schedule & conflicts' },
+    { name: 'Manage Users', path: '/admin/view-users', icon: Users, desc: 'Global accounts & directory' },
+    { name: 'Admission Wizard', path: '/admin/add-student', icon: UserPlus, desc: 'Register students with guardians' },
+    { name: 'Staff Management', path: '/admin/add-staff', icon: UserPlus, desc: 'Register teachers & staff' },
+    { name: 'Attendance Monitor', path: '/admin/attendance', icon: Calendar, desc: 'Track daily attendance' },
     { name: 'Homework Manager', path: '/admin/homework', icon: BookOpen, desc: 'View global homework log' },
-    { name: 'Tests & Analytics', path: '/admin/tests', icon: BarChart2, desc: 'School academic performance' },
-    { name: 'Behaviour Logs', path: '/admin/behaviour', icon: Heart, desc: 'Student character tracker' },
+    { name: 'Tests & Analytics', path: '/admin/tests', icon: BarChart2, desc: 'Exams & marks entry' },
+    { name: 'Behaviour Logs', path: '/admin/behaviour', icon: Heart, desc: 'Student character ratings' },
     { name: 'Release Reports', path: '/admin/reports', icon: Award, desc: 'Publish transcripts' },
     { name: 'WhatsApp Broadcast', path: '/admin/whatsapp', icon: MessageSquare, desc: 'Emergency school alert' },
-    { name: 'System Settings', path: '/admin/settings', icon: Settings, desc: 'API keys & snapshots' },
+    { name: 'System Settings', path: '/admin/settings', icon: Settings, desc: 'API keys & configuration' },
   ] : [
+    { name: 'Google Sheets Sync', path: '/admin/sheets', icon: FileSpreadsheet, desc: 'Export & edit in Sheets', badge: 'Sheets' },
+    { name: 'Class Timetable', path: '/admin/timetable', icon: Clock, desc: 'Class weekly schedule' },
     { name: 'Class Student List', path: '/admin/view-users', icon: Users, desc: 'Manage class registry' },
-    { name: 'Add Class Student', path: '/admin/add-student', icon: UserPlus, desc: 'Register class student' },
+    { name: 'Admit Student', path: '/admin/add-student', icon: UserPlus, desc: 'Register class student' },
     { name: 'Mark Attendance', path: '/admin/attendance', icon: Calendar, desc: 'Submit daily attendance' },
     { name: 'Class Homework', path: '/admin/homework', icon: BookOpen, desc: 'Assign class tasks' },
     { name: 'Enter Marks', path: '/admin/tests', icon: BarChart2, desc: 'Record test grades' },
@@ -65,7 +74,7 @@ export default function AdminLayout() {
             <UserCheck className="w-6 h-6 text-blue-600" />
           )}
           <span className="text-lg font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">
-            {isSuperAdmin ? 'Super Admin' : 'Class Admin'}
+            {isSuperAdmin ? 'Super Admin' : 'School Admin'}
           </span>
         </div>
         <button 
@@ -90,10 +99,10 @@ export default function AdminLayout() {
             </div>
             <div>
               <h2 className="text-white font-extrabold text-lg leading-tight truncate">
-                {isSuperAdmin ? 'Super Admin' : 'Class Admin'}
+                {isSuperAdmin ? 'Super Admin' : 'School Admin'}
               </h2>
               <span className="text-[10px] text-slate-500 font-mono tracking-wider block uppercase mt-0.5">
-                {isSuperAdmin ? 'School Console' : `${user.className}-${user.section} Panel`}
+                {isSuperAdmin ? 'Platform Console' : `${user.schoolName || 'School Console'}`}
               </span>
             </div>
           </div>
@@ -105,20 +114,30 @@ export default function AdminLayout() {
               const isActive = location.pathname === item.path;
               return (
                 <Link
-                  key={item.name}
+                  key={item.path}
                   to={item.path}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className={`
-                    flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 group
+                    flex items-center gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 group text-sm
                     ${isActive 
-                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/10' 
-                      : 'hover:bg-slate-800 hover:text-white text-slate-400'}
+                      ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-md shadow-blue-500/20' 
+                      : 'hover:bg-slate-800/60 text-slate-400 hover:text-slate-100'
+                    }
                   `}
                 >
-                  <Icon className={`w-5 h-5 shrink-0 transition-transform group-hover:scale-105 ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-blue-400'}`} />
-                  <div className="min-w-0">
-                    <span className="block truncate">{item.name}</span>
-                    <span className={`text-[10px] block font-normal truncate ${isActive ? 'text-blue-100' : 'text-slate-500'}`}>{item.desc}</span>
+                  <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-white' : 'text-slate-400 group-hover:text-slate-200'}`} />
+                  <div className="flex-1 truncate">
+                    <div className="leading-tight flex items-center justify-between">
+                      <span>{item.name}</span>
+                      {item.badge && (
+                        <span className="text-[10px] bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider">
+                          {item.badge}
+                        </span>
+                      )}
+                    </div>
+                    <span className={`text-[11px] block truncate mt-0.5 ${isActive ? 'text-blue-100' : 'text-slate-500 group-hover:text-slate-400'}`}>
+                      {item.desc}
+                    </span>
                   </div>
                 </Link>
               );
@@ -126,41 +145,29 @@ export default function AdminLayout() {
           </nav>
         </div>
 
-        {/* Sidebar Footer / User Profile & Logout */}
+        {/* User Footer & Logout */}
         <div className="p-4 border-t border-slate-800 bg-slate-950/20">
-          <div className="flex items-center justify-between gap-3 p-2 bg-slate-950/40 rounded-2xl border border-slate-800/60 mb-3">
-            <div className="min-w-0">
-              <span className="block text-xs font-bold text-white truncate">{user.name}</span>
-              <span className="block text-[10px] text-slate-500 truncate">{user.email}</span>
+          <div className="flex items-center justify-between gap-3 px-2 py-2 mb-2 bg-slate-800/40 rounded-xl">
+            <div className="truncate">
+              <div className="text-sm font-bold text-white truncate">{user.name || 'Administrator'}</div>
+              <div className="text-xs text-slate-400 truncate">{user.email || 'admin@school.edu'}</div>
             </div>
-            {isSuperAdmin && (
-              <span className="text-[9px] bg-red-500/10 text-red-400 border border-red-500/20 px-1.5 py-0.5 rounded font-extrabold font-mono shrink-0">SA</span>
-            )}
           </div>
           <button
             onClick={handleLogout}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 border border-red-500/20 hover:border-red-500/40 text-red-400 hover:text-red-300 bg-red-500/5 hover:bg-red-500/10 text-sm font-bold rounded-xl transition-all duration-300"
+            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 font-semibold text-sm transition-all"
           >
             <LogOut className="w-4 h-4" />
-            Logout
+            <span>Sign Out</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content Area */}
-      <main className="flex-1 flex flex-col min-w-0 bg-slate-50 relative">
-        <div className="flex-1 overflow-y-auto">
-          <Outlet />
-        </div>
+      <main className="flex-1 overflow-y-auto min-h-screen">
+        <Outlet />
       </main>
-      
-      {/* Mobile overlay */}
-      {isMobileMenuOpen && (
-        <div 
-          onClick={() => setIsMobileMenuOpen(false)}
-          className="fixed inset-0 bg-black/50 z-20 md:hidden transition-opacity duration-300"
-        />
-      )}
+
     </div>
   );
 }
