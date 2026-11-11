@@ -74,11 +74,11 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
 
           {/* STRICT ROLE-BASED NAVIGATION ITEMS */}
           <nav className="px-3 py-2 space-y-1 text-xs font-semibold">
-            {/* 1. SUPER ADMIN ONLY */}
+            {/* 1. SUPER ADMIN - FULL MASTER PLATFORM ACCESS */}
             {isSuperAdmin && (
               <>
-                <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-500 tracking-wider">
-                  Platform Administration
+                <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-indigo-400 tracking-wider">
+                  Platform Command
                 </div>
                 <NavLink
                   to="/platform/dashboard"
@@ -111,12 +111,104 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
                   }
                 >
                   <Megaphone className="h-4 w-4" />
-                  Broadcast Announcements
+                  Broadcast Circulars & Events
+                </NavLink>
+
+                <div className="pt-2 px-3 py-1.5 text-[10px] uppercase font-bold text-indigo-400 tracking-wider">
+                  Master School Administration
+                </div>
+                <NavLink
+                  to="/school/staff-management"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <Key className="h-4 w-4" />
+                  Staff Logins & Credentials
+                </NavLink>
+                <NavLink
+                  to="/school/students"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <Users className="h-4 w-4" />
+                  Student Directory & Admissions
+                </NavLink>
+                <NavLink
+                  to="/school/teachers-timetables"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <Clock className="h-4 w-4" />
+                  Teacher Directory & Timetables
+                </NavLink>
+                <NavLink
+                  to="/school/academics"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <CalendarCheck className="h-4 w-4" />
+                  Attendance & Report Cards
+                </NavLink>
+                <NavLink
+                  to="/school/homework"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <BookOpen className="h-4 w-4" />
+                  Homework & Assignments Hub
+                </NavLink>
+                <NavLink
+                  to="/school/behaviour"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <HeartHandshake className="h-4 w-4" />
+                  Behaviour & Welfare Analysis
+                </NavLink>
+                <NavLink
+                  to="/class/dashboard"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <UserCheck className="h-4 w-4" />
+                  Class Admin Workspace
+                </NavLink>
+                <NavLink
+                  to="/school/students/import"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <Upload className="h-4 w-4" />
+                  Bulk Ingestion Wizard
                 </NavLink>
               </>
             )}
 
-            {/* 2. OPERATIONS STAFF ONLY */}
+            {/* 2. OPERATIONS STAFF - AUDIT + STUDENT ADMISSION ACCESS */}
             {isOpsStaff && (
               <>
                 <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-500 tracking-wider">
@@ -132,6 +224,17 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
                 >
                   <ShieldCheck className="h-4 w-4" />
                   Ops Verification Queue
+                </NavLink>
+                <NavLink
+                  to="/school/students"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <Users className="h-4 w-4" />
+                  Student Directory & Admissions
                 </NavLink>
                 <NavLink
                   to="/school/teachers-timetables"
@@ -154,6 +257,17 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
                 >
                   <Upload className="h-4 w-4" />
                   Bulk CSV Ingestion Wizard
+                </NavLink>
+                <NavLink
+                  to="/school/announcements"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <Megaphone className="h-4 w-4" />
+                  Broadcast Circulars & Events
                 </NavLink>
               </>
             )}
@@ -263,7 +377,7 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
               </>
             )}
 
-            {/* 4. CLASS ADMIN ONLY */}
+            {/* 4. CLASS ADMIN - CLASS TEACHER WORKSPACE & ADMISSIONS */}
             {isClassAdmin && (
               <>
                 <div className="px-3 py-1.5 text-[10px] uppercase font-bold text-slate-500 tracking-wider">
@@ -279,6 +393,17 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
                 >
                   <UserCheck className="h-4 w-4" />
                   Class Section Workspace
+                </NavLink>
+                <NavLink
+                  to="/school/students"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <Users className="h-4 w-4" />
+                  My Class Students & Roster
                 </NavLink>
                 <NavLink
                   to="/school/academics"
@@ -312,6 +437,17 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
                 >
                   <HeartHandshake className="h-4 w-4" />
                   Behavioural Observations
+                </NavLink>
+                <NavLink
+                  to="/school/teachers-timetables"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <Clock className="h-4 w-4" />
+                  My Class Timetable
                 </NavLink>
               </>
             )}

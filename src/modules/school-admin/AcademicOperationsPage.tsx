@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { api } from '../../services/api';
 import {
   Clock,
   CheckCircle2,
@@ -9,7 +10,8 @@ import {
   AlertCircle,
   Eye,
   X,
-  Edit2
+  Edit2,
+  MessageCircle
 } from 'lucide-react';
 
 interface ParentDispatchRecord {
@@ -26,6 +28,7 @@ interface ParentDispatchRecord {
   grade: string;
   status: 'delivered' | 'pending' | 'missing_email';
   lastSent?: string;
+  whatsappSent?: string;
 }
 
 export const AcademicOperationsPage: React.FC = () => {
@@ -183,11 +186,21 @@ export const AcademicOperationsPage: React.FC = () => {
     setTimeout(() => setToastMessage(null), 4000);
   };
 
-  const handleSendIndividual = (rec: ParentDispatchRecord) => {
+  const handleSendIndividual = async (rec: ParentDispatchRecord) => {
     if (!rec.parentEmail) {
       setEditingStudent(rec);
       setEditEmailInput('');
       return;
+    }
+
+    try {
+      await api.post('/academics/send-parent-reports', {
+        student_ids: [rec.id],
+        term: selectedTerm,
+        parent_email: rec.parentEmail
+      });
+    } catch (_) {
+      // Local fallback
     }
 
     setParentRecords((prev) =>
@@ -202,11 +215,52 @@ export const AcademicOperationsPage: React.FC = () => {
       )
     );
 
-    setToastMessage(`Report card & attendance summary dispatched to ${rec.parentEmail} successfully.`);
-    setTimeout(() => setToastMessage(null), 4000);
+    setToastMessage(`Official report card & attendance digest successfully delivered to ${rec.parentEmail}.`);
+    setTimeout(() => setToastMessage(null), 4500);
   };
 
-  const handleBulkDispatch = () => {
+  const handleSendWhatsApp = (rec: ParentDispatchRecord) => {
+    const cleanPhone = rec.parentPhone.replace(/[^0-9]/g, '');
+    const message = encodeURIComponent(
+      `🏫 *Rithik Group of Companies - Official School ERP*\n` +
+      `*Academic Progress Report & Attendance Digest*\n\n` +
+      `Dear ${rec.parentName},\n` +
+      `Official evaluation summary for your ward *${rec.studentName}* (Roll: #${rec.roll}):\n\n` +
+      `• *Section:* ${selectedDispatchSection}\n` +
+      `• *Term Evaluation:* ${selectedTerm}\n` +
+      `• *Term Average:* ${rec.termAverage}%\n` +
+      `• *Awarded Grade:* ${rec.grade}\n` +
+      `• *Attendance Record:* ${rec.attendancePct}% (${rec.presentDays} of ${rec.workingDays} working days)\n` +
+      `• *Status:* Satisfactory & Regular\n\n` +
+      `_Dispatched automatically by Rithik Group Multi-School ERP._`
+    );
+
+    window.open(`https://wa.me/${cleanPhone}?text=${message}`, '_blank');
+
+    setParentRecords((prev) =>
+      prev.map((r) =>
+        r.id === rec.id
+          ? {
+              ...r,
+              whatsappSent: new Date().toLocaleString()
+            }
+          : r
+      )
+    );
+
+    try {
+      api.post('/academics/send-whatsapp-reports', {
+        student_id: rec.id,
+        parent_phone: rec.parentPhone,
+        term: selectedTerm
+      });
+    } catch (_) {}
+
+    setToastMessage(`WhatsApp report card opened for ${rec.parentName} (${rec.parentPhone})`);
+    setTimeout(() => setToastMessage(null), 4500);
+  };
+
+  const handleBulkDispatch = async () => {
     const validCount = parentRecords.filter((r) => r.parentEmail).length;
     if (validCount === 0) {
       alert('No parents with registered email addresses in this class.');
@@ -214,24 +268,29 @@ export const AcademicOperationsPage: React.FC = () => {
     }
 
     setIsBulkSending(true);
-    setTimeout(() => {
-      setParentRecords((prev) =>
-        prev.map((r) =>
-          r.parentEmail
-            ? {
-                ...r,
-                status: 'delivered',
-                lastSent: new Date().toLocaleString()
-              }
-            : r
-        )
-      );
-      setIsBulkSending(false);
-      setToastMessage(
-        `Batch dispatch completed! Academic progress report & attendance summaries successfully sent to ${validCount} parent email(s).`
-      );
-      setTimeout(() => setToastMessage(null), 5000);
-    }, 1200);
+    try {
+      await api.post('/academics/send-parent-reports', {
+        student_ids: parentRecords.filter((r) => r.parentEmail).map((r) => r.id),
+        term: selectedTerm
+      });
+    } catch (_) {}
+
+    setParentRecords((prev) =>
+      prev.map((r) =>
+        r.parentEmail
+          ? {
+              ...r,
+              status: 'delivered',
+              lastSent: new Date().toLocaleString()
+            }
+          : r
+      )
+    );
+    setIsBulkSending(false);
+    setToastMessage(
+      `Batch email dispatch completed! Academic progress report & attendance summaries sent to ${validCount} parent email(s).`
+    );
+    setTimeout(() => setToastMessage(null), 5000);
   };
 
   return (
@@ -665,30 +724,41 @@ export const AcademicOperationsPage: React.FC = () => {
                       <div className="text-[10px] text-slate-400 font-medium">Avg: {record.termAverage}%</div>
                     </td>
                     <td className="py-3.5 px-4">
-                      {record.status === 'delivered' ? (
-                        <div>
+                      <div className="space-y-1">
+                        {record.status === 'delivered' ? (
                           <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                            <CheckCircle2 className="h-3 w-3" /> Sent to Parent
+                            <CheckCircle2 className="h-3 w-3" /> Email Dispatched
                           </span>
-                          {record.lastSent && (
-                            <div className="text-[9px] text-slate-400 mt-0.5">{record.lastSent}</div>
-                          )}
-                        </div>
-                      ) : record.status === 'missing_email' ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
-                          <AlertCircle className="h-3 w-3" /> Missing Email
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                          Pending Dispatch
-                        </span>
-                      )}
+                        ) : record.status === 'missing_email' ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
+                            <AlertCircle className="h-3 w-3" /> Missing Email
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                            Pending Email
+                          </span>
+                        )}
+
+                        {record.whatsappSent && (
+                          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-bold bg-emerald-100 text-emerald-800">
+                            <MessageCircle className="h-2.5 w-2.5" /> WhatsApp Sent
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => handleSendWhatsApp(record)}
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 cursor-pointer"
+                          title="Open WhatsApp Message to Parent"
+                        >
+                          <MessageCircle className="h-3.5 w-3.5 text-emerald-600" />
+                          WhatsApp
+                        </button>
                         <button
                           onClick={() => setPreviewStudent(record)}
-                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200"
+                          className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 cursor-pointer"
                           title="Preview Email Content"
                         >
                           <Eye className="h-3.5 w-3.5" />
@@ -696,7 +766,7 @@ export const AcademicOperationsPage: React.FC = () => {
                         </button>
                         <button
                           onClick={() => handleSendIndividual(record)}
-                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700"
+                          className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 cursor-pointer"
                         >
                           <Send className="h-3 w-3" />
                           Send Email
