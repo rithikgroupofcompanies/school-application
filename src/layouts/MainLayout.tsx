@@ -470,6 +470,28 @@ export const MainLayout: React.FC<{ children: React.ReactNode }> = ({ children }
                   Marks Entry & Attendance
                 </NavLink>
                 <NavLink
+                  to="/school/students"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <Users className="h-4 w-4" />
+                  Student Admissions & Roster
+                </NavLink>
+                <NavLink
+                  to="/class/dashboard"
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
+                      isActive ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                    }`
+                  }
+                >
+                  <UserCheck className="h-4 w-4" />
+                  Class Section Workspace
+                </NavLink>
+                <NavLink
                   to="/school/homework"
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2.5 rounded-xl transition ${
